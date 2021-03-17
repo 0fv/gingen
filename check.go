@@ -3,30 +3,13 @@ package main
 import (
 	"go/ast"
 	"go/token"
-	"strings"
 )
 
-var tag = "! "
 
-type routeInfo struct {
-	comment      string
-	name         string
-	structInfo   *ast.GenDecl
-	functionList []*functionInfo
-	routeList    []*routeInfo
-}
 
-type functionInfo struct {
-	comment string
-	name    string
-	recv    string
-	astInfo *ast.FuncDecl
-}
-
-var rInfo routeInfo
 
 func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *routeInfo, ok bool) {
-	info = &routeInfo{}
+	// info = &routeInfo{}
 	if spec, ok := n.(*ast.GenDecl); ok {
 		if spec.Tok == token.TYPE {
 			if len(spec.Specs) == 1 {
@@ -40,19 +23,20 @@ func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *routeInfo, ok 
 					}
 				}
 			}
-			for _, comment := range comments {
-				if commentCheck(comment) {
-					info.comment = comment.Text()
+			for _, v := range comments {
+				if commentCheck(v) {
+					info.c = comment(v.Text())
+					info.route, info.parent = info.c.checkGroup(info.name)
 					return info, true
 				}
 			}
 		}
 
 	}
-	return
+	return nil, false
 }
 
-func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *functionInfo, ok bool) {
+func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *functionInfo, err error) {
 	info = &functionInfo{}
 	if spec, ok := n.(*ast.FuncDecl); ok {
 		if star, ok := spec.Recv.List[0].Type.(*ast.StarExpr); ok {
@@ -68,7 +52,7 @@ func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *functionInfo, ok
 		}
 		//paramsCheck
 		if spec.Type.Params.NumFields() != 1 {
-			return nil, false
+			return nil, nil
 		}
 		li := spec.Type.Params.List[0]
 		if p, ok := li.Type.(*ast.StarExpr); ok {
@@ -77,19 +61,15 @@ func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *functionInfo, ok
 					if sel.Sel.Name == "Context" {
 						for _, v := range comments {
 							if commentCheck(v) {
-								info.comment = v.Text()
-								return info, true
+								info.c = comment(v.Text())
+								info.route, info.method, info.middleware, err = info.c.routeFuncProcess(info.name)
+								return info, err
 							}
 						}
 					}
 				}
 			}
 		}
-
 	}
-	return
-}
-
-func commentCheck(c *ast.CommentGroup) bool {
-	return strings.HasPrefix(c.Text(), tag)
+	return nil, nil
 }
