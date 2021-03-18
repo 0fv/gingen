@@ -1,18 +1,24 @@
-package main
+package gingen
 
 import (
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func processDir(dir string) (rs routeList, err error) {
-	var tempFuncs functionList
+var pkgName string
+
+//ProcessDir ...
+func ProcessDir() (rs RouteList, err error) {
+	return processDir("./")
+}
+
+func processDir(dir string) (rs RouteList, err error) {
+	var tempFuncs FunctionList
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
@@ -23,17 +29,21 @@ func processDir(dir string) (rs routeList, err error) {
 			return nil, err
 		}
 		if !fInfo.IsDir() && strings.HasSuffix(fInfo.Name(), ".go") {
-			rt, fs, err := processFile(dir + "/" + fInfo.Name())
+			cmap, err := cmapgen(dir + "/" + fInfo.Name())
+			if err != nil {
+				return nil, err
+			}
+			rt, fs, err := processFile(cmap, fInfo.Name())
 			if err != nil {
 				return nil, err
 			}
 			//assign function
 			for i, v := range rt {
-				in, ex := fs.splitByRecv(v.name)
-				in2, tempFuncs := tempFuncs.splitByRecv(v.name)
+				in, ex := fs.splitByRecv(v.Name)
+				in2, tempFuncs := tempFuncs.splitByRecv(v.Name)
 				tempFuncs = append(tempFuncs, ex...)
-				rt[i].functionList = append(rt[i].functionList, in...)
-				rt[i].functionList = append(rt[i].functionList, in2...)
+				rt[i].FunctionList = append(rt[i].FunctionList, in...)
+				rt[i].FunctionList = append(rt[i].FunctionList, in2...)
 			}
 			rs = append(rs, rt...)
 		}
@@ -41,17 +51,22 @@ func processDir(dir string) (rs routeList, err error) {
 	return
 }
 
-func processFile(fileName string) (rs routeList, fs functionList, err error) {
+func cmapgen(fileName string) (ast.CommentMap, error) {
 	fset := token.NewFileSet()
 	path, _ := filepath.Abs(fileName)
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
-		log.Println(err)
-		return
+		return nil, err
 	}
-	cmap := ast.NewCommentMap(fset, f, f.Comments)
+	if pkgName == "" {
+		pkgName = f.Name.Name
+	}
+	return ast.NewCommentMap(fset, f, f.Comments), nil
+}
+
+func processFile(cmap ast.CommentMap, fileName string) (rs RouteList, fs FunctionList, err error) {
 	for k, v := range cmap {
-		var fInfo *functionInfo
+		var fInfo *FunctionInfo
 		fInfo, err = checkFunc(k, v)
 		if err != nil {
 			err = fmt.Errorf("%v: %v", fileName, err.Error())

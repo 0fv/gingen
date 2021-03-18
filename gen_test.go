@@ -1,9 +1,10 @@
-package main
+package gingen
 
 import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -41,23 +42,47 @@ func Test_CheckStruct(t *testing.T) {
 	}
 }
 
-func Test_processFile(t *testing.T) {
-	t.Log(processFile("./example/foo.go"))
-	t.Log(processFile("./example/foo2.go"))
-}
+// func Test_CheckPackage(t *testing.T) {
+// 	cmap = loadFile("./example/bar.go", t)
+// 	processPkgName
+// }
 
 func Test_processDir(t *testing.T) {
 	t.Log(processDir("./example"))
 }
 
-func Test_buildTree(t *testing.T) {
+func br(t *testing.T) RouteList {
 	rs, err := processDir("./example")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Log(rs.buildTree())
+	return rs.BuildTree()
 }
 
-func Test(t *testing.T) {
-	
+func Test_buildTree(t *testing.T) {
+	t.Log(br(t))
+}
+
+func Test_genRoot(t *testing.T) {
+	rs := br(t)
+	err := genRoot(rs, os.Stdout)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func Test_genSub(t *testing.T) {
+	r := br(t)
+	err := genSub(r[0], os.Stdout)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func Test_genAll(t *testing.T) {
+	r := br(t)
+	err := genAll(r, os.Stdout)
+	if err != nil {
+		t.Fatal(err)
+	}
 }

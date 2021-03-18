@@ -1,4 +1,4 @@
-package main
+package gingen
 
 import (
 	"go/ast"
@@ -6,9 +6,7 @@ import (
 )
 
 
-
-
-func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *routeInfo, ok bool) {
+func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *RouteInfo, ok bool) {
 	// info = &routeInfo{}
 	if spec, ok := n.(*ast.GenDecl); ok {
 		if spec.Tok == token.TYPE {
@@ -16,8 +14,8 @@ func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *routeInfo, ok 
 				sps := spec.Specs[0]
 				if m, ok := sps.(*ast.TypeSpec); ok {
 					if m.Name != nil {
-						info = &routeInfo{
-							name:       m.Name.Name,
+						info = &RouteInfo{
+							Name:       m.Name.Name,
 							structInfo: spec,
 						}
 					}
@@ -25,8 +23,8 @@ func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *routeInfo, ok 
 			}
 			for _, v := range comments {
 				if commentCheck(v) {
-					info.c = comment(v.Text())
-					info.route, info.parent = info.c.checkGroup(info.name)
+					info.C = comment(v.Text())
+					info.Route, info.Parent = info.C.checkGroup(info.Name)
 					return info, true
 				}
 			}
@@ -36,15 +34,15 @@ func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *routeInfo, ok 
 	return nil, false
 }
 
-func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *functionInfo, err error) {
-	info = &functionInfo{}
+func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *FunctionInfo, err error) {
+	info = &FunctionInfo{}
 	if spec, ok := n.(*ast.FuncDecl); ok {
 		if star, ok := spec.Recv.List[0].Type.(*ast.StarExpr); ok {
 			if ident, ok := (star.X).(*ast.Ident); ok {
 				if spec.Name != nil {
-					info = &functionInfo{
-						recv:    ident.Name,
-						name:    spec.Name.Name,
+					info = &FunctionInfo{
+						Recv:    ident.Name,
+						Name:    spec.Name.Name,
 						astInfo: spec,
 					}
 				}
@@ -61,8 +59,8 @@ func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *functionInfo, er
 					if sel.Sel.Name == "Context" {
 						for _, v := range comments {
 							if commentCheck(v) {
-								info.c = comment(v.Text())
-								info.route, info.method, info.middleware, err = info.c.routeFuncProcess(info.name)
+								info.C = comment(v.Text())
+								info.Route, info.Method, info.Middleware, err = info.C.routeFuncProcess(info.Name)
 								return info, err
 							}
 						}

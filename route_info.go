@@ -1,4 +1,4 @@
-package main
+package gingen
 
 import (
 	"fmt"
@@ -7,23 +7,23 @@ import (
 	"strings"
 )
 
-type routeInfo struct {
-	route        string
-	parent       string
-	c            comment
-	name         string
+type RouteInfo struct {
+	Route        string
+	Parent       string
+	C            comment
+	Name         string
 	structInfo   *ast.GenDecl
-	functionList functionList
-	routeList    routeList
+	FunctionList FunctionList
+	RouteList    RouteList
 }
 
-type functionInfo struct {
-	route      string
-	method     []string
-	c          comment
-	middleware bool
-	name       string
-	recv       string
+type FunctionInfo struct {
+	Route      string
+	Method     []string
+	C          comment
+	Middleware bool
+	Name       string
+	Recv       string
 	astInfo    *ast.FuncDecl
 }
 
@@ -35,19 +35,19 @@ var errDeplicateRoute = func(s1, s2 string) error {
 	return fmt.Errorf("deplicate route in diffrent struct:%v %v", s1, s2)
 }
 
-type functionList []*functionInfo
+type FunctionList []*FunctionInfo
 
-func (f functionList) String() string {
+func (f FunctionList) String() string {
 	fL := []string{}
 	for _, v := range f {
-		fL = append(fL, fmt.Sprintf("  %v", v))
+		fL = append(fL, fmt.Sprintf("%v", v))
 	}
-	return strings.Join(fL, "\n")
+	return strings.Join(fL, "\n   ")
 }
 
-func (f functionList) splitByRecv(recv string) (include, exclude functionList) {
+func (f FunctionList) splitByRecv(recv string) (include, exclude FunctionList) {
 	for _, v := range f {
-		if v.recv == recv {
+		if v.Recv == recv {
 			include = append(include, v)
 		} else {
 			exclude = append(exclude, v)
@@ -56,22 +56,22 @@ func (f functionList) splitByRecv(recv string) (include, exclude functionList) {
 	return
 }
 
-func (r routeList) buildTree() (tree routeList) {
-	m := make(map[string]routeList)
+func (r RouteList) BuildTree() (tree RouteList) {
+	m := make(map[string]RouteList)
 	for i := range r {
-		m[r[i].route] = append(m[r[i].route], r[i])
+		m[r[i].Route] = append(m[r[i].Route], r[i])
 	}
 	for _, v := range m {
 		for i := range v {
-			if v[i].parent == "" {
+			if v[i].Parent == "" {
 				tree = append(tree, v[i])
 			} else {
-				parents, ok := m[v[i].parent]
+				parents, ok := m[v[i].Parent]
 				if !ok {
-					log.Printf("warn: missing parent:%v", v[i].parent)
+					log.Printf("warn: missing parent:%v", v[i].Parent)
 				}
 				for i := range parents {
-					parents[i].routeList = append(parents[i].routeList, v[i])
+					parents[i].RouteList = append(parents[i].RouteList, v[i])
 				}
 			}
 		}
@@ -79,39 +79,39 @@ func (r routeList) buildTree() (tree routeList) {
 	return
 }
 
-type routeList []*routeInfo
+type RouteList []*RouteInfo
 
-func (r routeList) String() string {
+func (r RouteList) String() string {
 	rL := []string{}
 	for _, v := range r {
 		rL = append(rL, fmt.Sprint(v))
 	}
-	return strings.Join(rL, "\n")
+	return strings.Join(rL, "    \n")
 }
 
-func (r routeList) findByRouteName(name string) (*routeInfo, error) {
+func (r RouteList) findByRouteName(name string) (*RouteInfo, error) {
 	for _, v := range r {
-		if v.route == name {
+		if v.Route == name {
 			return v, nil
 		}
 	}
 	return nil, errNotFound(route, name)
 }
 
-func (r routeList) findByParent(parent string) []*routeInfo {
-	var rl []*routeInfo
+func (r RouteList) findByParent(parent string) []*RouteInfo {
+	var rl []*RouteInfo
 	for _, v := range r {
-		if v.parent == parent {
+		if v.Parent == parent {
 			rl = append(rl, v)
 		}
 	}
 	return rl
 }
 
-func (r routeInfo) String() string {
-	return fmt.Sprintf("struct:%v route:%v parent:%v function:\n   %v\n children:\n   %v", r.name, r.route, r.parent, r.functionList, r.routeList)
+func (r RouteInfo) String() string {
+	return fmt.Sprintf("struct:%v route:%v parent:%v function:\n   %v\n children:\n   %v", r.Name, r.Route, r.Parent, r.FunctionList, r.RouteList)
 }
 
-func (f functionInfo) String() string {
-	return fmt.Sprintf("recv:%v route:%v method:%v name:%v middleware:%v", f.recv, f.route, f.method, f.name, f.middleware)
+func (f FunctionInfo) String() string {
+	return fmt.Sprintf("recv:%v route:%v method:%v name:%v middleware:%v", f.Recv, f.Route, f.Method, f.Name, f.Middleware)
 }

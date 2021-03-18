@@ -1,4 +1,4 @@
-package main
+package gingen
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 type comment string
 
 var (
-	tag = "! "
+	tag = "!"
 
 	method     = "method"
 	group      = "group"
@@ -39,6 +39,13 @@ var methodMap = map[string]struct{}{
 	OPTIONS: {},
 	HEAD:    {},
 	Any:     {},
+}
+
+//UnderlineSet ...
+func UnderlineSet(i string) {
+	if i == "f" || i == "false" {
+		underline = false
+	}
 }
 
 var ErrNotDefined = func(name, abbr string) error {
