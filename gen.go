@@ -87,7 +87,7 @@ func genAll(rs RouteList, wirter io.Writer) error {
 
 func genRoot(rs RouteList, wirter io.Writer) error {
 	data := map[string]interface{}{
-		"pkg": os.Getenv("GOPACKAGE"),
+		"pkg": pkgName,
 		"li":  rs,
 	}
 	t, err := template.New("").Parse(rootltpl)

@@ -10,11 +10,11 @@ func initRoute(r *gin.Engine){
 	route_bar := bar{}
 	
 	group_bar:= r.Group("/bar")
-	group_bar.Use(route_bar.ware)
-	
 	group_bar.POST("/:test2",route_bar.post)
 	
 	group_bar.GET("/:test3",route_bar.get)
+	
+	group_bar.Use(route_bar.ware)
 	
 	init_foo2(group_bar)
 	
@@ -22,11 +22,11 @@ func initRoute(r *gin.Engine){
 	route_bar2 := bar2{}
 	
 	group_bar2:= r.Group("/bar2")
+	group_bar2.Use(route_bar2.ware)
+	
 	group_bar2.POST("/:test2",route_bar2.post)
 	
 	group_bar2.GET("/:test3",route_bar2.get)
-	
-	group_bar2.Use(route_bar2.ware)
 	
 	
 	route_foo := foo{}
@@ -60,11 +60,11 @@ func init_bar(r *gin.RouterGroup){
 	route_bar := bar{}
 	
 	group_bar:= r.Group("/bar")
-	group_bar.Use(route_bar.ware)
-	
 	group_bar.POST("/:test2",route_bar.post)
 	
 	group_bar.GET("/:test3",route_bar.get)
+	
+	group_bar.Use(route_bar.ware)
 	
 	init_foo2(group_bar)
 	
@@ -90,11 +90,11 @@ func init_bar2(r *gin.RouterGroup){
 	route_bar2 := bar2{}
 	
 	group_bar2:= r.Group("/bar2")
+	group_bar2.Use(route_bar2.ware)
+	
 	group_bar2.POST("/:test2",route_bar2.post)
 	
 	group_bar2.GET("/:test3",route_bar2.get)
-	
-	group_bar2.Use(route_bar2.ware)
 	
 }
 
@@ -126,11 +126,11 @@ func init_bar(r *gin.RouterGroup){
 	route_bar := bar{}
 	
 	group_bar:= r.Group("/bar")
-	group_bar.Use(route_bar.ware)
-	
 	group_bar.POST("/:test2",route_bar.post)
 	
 	group_bar.GET("/:test3",route_bar.get)
+	
+	group_bar.Use(route_bar.ware)
 	
 	init_foo2(group_bar)
 	
@@ -156,11 +156,11 @@ func init_bar2(r *gin.RouterGroup){
 	route_bar2 := bar2{}
 	
 	group_bar2:= r.Group("/bar2")
+	group_bar2.Use(route_bar2.ware)
+	
 	group_bar2.POST("/:test2",route_bar2.post)
 	
 	group_bar2.GET("/:test3",route_bar2.get)
-	
-	group_bar2.Use(route_bar2.ware)
 	
 }
 
