@@ -5,7 +5,6 @@ import (
 	"go/token"
 )
 
-
 func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *RouteInfo, ok bool) {
 	// info = &routeInfo{}
 	if spec, ok := n.(*ast.GenDecl); ok {
@@ -36,7 +35,7 @@ func checkStruct(n ast.Node, comments []*ast.CommentGroup) (info *RouteInfo, ok 
 
 func checkFunc(n ast.Node, comments []*ast.CommentGroup) (info *FunctionInfo, err error) {
 	info = &FunctionInfo{}
-	if spec, ok := n.(*ast.FuncDecl); ok {
+	if spec, ok := n.(*ast.FuncDecl); ok && spec.Recv != nil && len(spec.Recv.List) != 0 {
 		if star, ok := spec.Recv.List[0].Type.(*ast.StarExpr); ok {
 			if ident, ok := (star.X).(*ast.Ident); ok {
 				if spec.Name != nil {
