@@ -21,8 +21,7 @@ func main() {
 	if len(rs) == 0 {
 		log.Fatal("no relative route found")
 	}
-	rs.BuildTree()
-	if err = gingen.GenFile(rs); err != nil {
+	if err = gingen.GenFile(rs.BuildTree()); err != nil {
 		log.Fatal(err)
 	}
 }
