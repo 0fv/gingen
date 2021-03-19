@@ -12,10 +12,14 @@ var (
 )
 
 func main() {
+	flag.Parse()
 	gingen.UnderlineSet(*underline)
 	rs, err := gingen.ProcessDir()
 	if err != nil {
 		log.Fatal(err)
+	}
+	if len(rs) == 0 {
+		log.Fatal("no relative route found")
 	}
 	rs.BuildTree()
 	if err = gingen.GenFile(rs); err != nil {

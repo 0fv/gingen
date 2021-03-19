@@ -28,7 +28,7 @@ func processDir(dir string) (rs RouteList, err error) {
 		if err != nil {
 			return nil, err
 		}
-		if !fInfo.IsDir() && strings.HasSuffix(fInfo.Name(), ".go") {
+		if !fInfo.IsDir() && strings.HasSuffix(fInfo.Name(), ".go") && (!strings.HasSuffix(fInfo.Name(), suffix)) {
 			cmap, err := cmapgen(dir + "/" + fInfo.Name())
 			if err != nil {
 				return nil, err

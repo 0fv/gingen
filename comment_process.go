@@ -30,15 +30,15 @@ const (
 	Any     = "Any"
 )
 
-var methodMap = map[string]struct{}{
-	GET:     {},
-	POST:    {},
-	DELETE:  {},
-	PATCH:   {},
-	PUT:     {},
-	OPTIONS: {},
-	HEAD:    {},
-	Any:     {},
+var methodList = []string{
+	GET,
+	POST,
+	DELETE,
+	PATCH,
+	PUT,
+	OPTIONS,
+	HEAD,
+	Any,
 }
 
 //UnderlineSet ...
@@ -100,15 +100,15 @@ func (c comment) routeFuncProcess(funcName string) (r string, m []string, mw boo
 	}
 	//check method,if method not defined,use funcName
 	if len(m) == 0 {
-		if _, ok := methodMap[strings.ToUpper(funcName)]; ok {
-			m = append(m, strings.ToUpper(funcName))
-		} else {
-			err = ErrNotDefined(funcName, "request method")
+		for _, v := range methodList {
+			if strings.ToLower(v) == strings.ToLower(funcName) {
+				m = append(m, v)
+				return
+			}
 		}
 	}
-	//change to underline
-	if underline {
-		r = snakeString(r)
+	if len(m) == 0 {
+		err = ErrNotDefined(funcName, "request method")
 	}
 	return
 }
