@@ -78,8 +78,10 @@ func genAll(rs RouteList, wirter io.Writer) error {
 		return err
 	}
 	for _, v := range rs {
-		if err := genSub(v, wirter); err != nil {
-			return err
+		for _, r := range v.RouteList {
+			if err := genSub(r, wirter); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
