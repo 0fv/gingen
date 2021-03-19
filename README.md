@@ -8,7 +8,7 @@ gin route file generator
 go get -u github.com/0fv/gingen/cmd/gingen
 ```
 
-## Useage Exmaple
+## Usage Example
 
 ```go
 //! group=/foo2 parent=/bar               <== create group /foo2 under gourp /bar(if group not defined,group name=struct name)
@@ -31,4 +31,6 @@ func (f *foo2) ware(ctx *gin.Context) {
 }
 
 ```
+
+* [example](https://github.com/0fv/gingen/tree/master/example)
 

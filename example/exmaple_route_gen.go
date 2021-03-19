@@ -10,13 +10,13 @@ func initRoute(r *gin.Engine){
 	route_foo := foo{}
 	
 	group_foo:= r.Group("/foo")
+	group_foo.POST("/:test2",route_foo.post)
+	
 	group_foo.GET("",route_foo.get)
 	
 	group_foo.PUT("/update",route_foo.put)
 	
 	group_foo.Use(route_foo.ware)
-	
-	group_foo.POST("/:test2",route_foo.post)
 	
 	init_bar(group_foo)
 	
@@ -30,11 +30,11 @@ func init_bar(r *gin.RouterGroup){
 	route_bar := bar{}
 	
 	group_bar:= r.Group("/bar")
+	group_bar.Use(route_bar.ware)
+	
 	group_bar.POST("/:test2",route_bar.post)
 	
 	group_bar.GET("/:test3",route_bar.get)
-	
-	group_bar.Use(route_bar.ware)
 	
 	init_foo2(group_bar)
 	
